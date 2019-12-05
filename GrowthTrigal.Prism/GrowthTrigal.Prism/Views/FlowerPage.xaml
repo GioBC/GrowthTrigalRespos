@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.FlowerPage"
+             Title="{Binding Title}">
+
+    <StackLayout
+        Padding="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label
+                 Grid.Column="0"
+                FontAttributes="Bold"
+                  Text="Tipo"
+               HorizontalOptions="CenterAndExpand"/>
+            <Label
+                 Grid.Column="1"
+                FontAttributes="Bold"
+                  Text="Variedad"
+                HorizontalOptions="CenterAndExpand"/>
+            <Label
+                 Grid.Column="2"
+                FontAttributes="Bold"
+                 Text="Cama"
+                 HorizontalOptions="CenterAndExpand"/>
+        </Grid>
+        <ListView
+            HasUnevenRows="True"
+            ItemsSource="{Binding Seed}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Frame
+                            BackgroundColor="LightGray"
+                            OutlineColor="#0a0e3d"
+                            CornerRadius="10"
+                            Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectBlockSeedComand}"/>
+                                </Grid.GestureRecognizers>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!--<Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>-->
+                                <Label                           
+                                Grid.Column="0"
+                                Text="{Binding Type}"
+                                HorizontalOptions="CenterAndExpand"
+                                     FontSize="Medium"/>
+                                <Label
+                                Grid.Column="1"
+                                Text="{Binding VarietyName}"
+                                HorizontalOptions="CenterAndExpand"
+                                     FontSize="Medium"/>
+                                <Label
+                                Grid.Column="2"
+                                Text="{Binding BedName}"
+                                HorizontalOptions="CenterAndExpand"
+                                     FontSize="Medium"/>
+                            </Grid>
+                        </Frame>
+                      
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+
+</ContentPage>

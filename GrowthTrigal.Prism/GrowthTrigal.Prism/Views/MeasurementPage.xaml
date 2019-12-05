@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.MeasurementPage"
+             Title="{Binding Title}">
+
+
+
+    <ContentPage.ToolbarItems>
+  <ToolbarItem Icon="ic_edit" Command="{Binding EditMeasureCommand}"/>
+    </ContentPage.ToolbarItems>
+    
+    <ContentView
+        Margin="10"
+        Padding="25"
+        HorizontalOptions="Fill"
+        VerticalOptions="CenterAndExpand"
+        BackgroundColor="LightGray">
+        <StackLayout>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid
+                 Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Label
+                                    
+                 Grid.Row="0"
+                 Grid.Column="0"
+                 FontAttributes="Bold"
+                    FontSize="Large"     
+
+                  Text="Medida:" />
+                    <Label                                   
+                  Grid.Row="0"
+                  Grid.Column="1"  
+                    FontSize="Large"
+
+                 Text="{Binding  Measurements.Measure}" />
+
+                    <Label
+                                    
+                 Grid.Row="1"
+                 Grid.Column="0"
+                 FontAttributes="Bold"
+                     FontSize="Large"  
+  
+                  Text="Fecha:" />
+                    <Label                                   
+                  Grid.Row="1"
+                  Grid.Column="1"        
+                    FontSize="Large"
+
+                 Text="{Binding Measurements.MeasureDateLocal, StringFormat='{0:yyyy/MM/dd}'}" />
+
+
+                </Grid>
+            </Grid>
+        </StackLayout>
+
+    </ContentView>
+    
+
+
+
+</ContentPage>

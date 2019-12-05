@@ -1,0 +1,28 @@
+﻿@model GrowthTrigal.Web.Models.MeasurementsViewModel
+
+@{
+    ViewData["Title"] = "Edit Measure";
+}
+
+<h2>Edit</h2>
+
+<h4>Measure</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditMeasure">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="FlowerId" />
+            <input type="hidden" asp-for="HomeId" />
+            <input type="hidden" asp-for="UpId" />
+            @*<input type="hidden" asp-for="Id" />*@
+
+            <partial name="_Measurements" />
+            <div class="form-group">
+
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="DetailsMeasure" asp-route-id="@Model.FlowerId" class="btn btn-success">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>

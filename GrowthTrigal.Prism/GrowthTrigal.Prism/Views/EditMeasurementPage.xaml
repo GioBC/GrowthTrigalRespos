@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.EditMeasurementPage"
+             Title="{Binding Title}">
+    <StackLayout
+        Padding="10">
+        <ScrollView>
+            <AbsoluteLayout>
+                <StackLayout
+                  AbsoluteLayout.LayoutBounds="0,0,1,1"
+                    AbsoluteLayout.LayoutFlags="All">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+
+                        </Grid.RowDefinitions>
+
+                        <Label
+                Grid.Column="0"
+                 Grid.Row="0"
+                 Text="Medida"
+                FontSize="Medium"
+                FontAttributes="Bold"
+                 VerticalOptions="Center"/>
+                        <Entry
+                            Keyboard="Numeric"
+                Grid.Column="1"
+                Grid.Row="0" 
+                 Text="{Binding Measurement.Measure}"/>
+
+                        <Label
+                 Grid.Column="0"
+                 Grid.Row="1"
+                    Text="Fecha"
+                  FontSize="Medium"
+                   FontAttributes="Bold"
+                 VerticalOptions="Center"/>
+                        <DatePicker
+                 Grid.Column="1"
+                 Grid.Row="1"    
+                 Format="{Binding Measurement.MeasureDateLocal, StringFormat='{0:yyyy/MM/dd}'}"/>
+
+                        <!--<Label
+                Grid.Column="0"
+                 Grid.Row="2"
+                 Text="Medidor"
+                FontSize="Medium"
+                FontAttributes="Bold"
+                 VerticalOptions="Center"/>
+                        <Picker
+                Grid.Column="1"
+                Grid.Row="2" 
+                ItemDisplayBinding="{Binding Document}"
+                	        ItemsSource="{Binding Measurement.Measurer}"
+                	        SelectedItem="{Binding Measurement.Measurer}"
+                        Title="Seleccione Medidor"/>-->
+                    </Grid>
+
+                </StackLayout>
+            </AbsoluteLayout>
+
+        </ScrollView>
+        
+        <StackLayout
+            Margin="30,0"
+            Orientation="Horizontal"
+            VerticalOptions="CenterAndExpand">
+
+            <Button
+                Command="{Binding SaveCommand}" 
+                IsEnabled="{Binding IsEnabled}"
+                HorizontalOptions="FillAndExpand"
+                BackgroundColor="#292D4C"
+                BorderRadius="20"
+                HeightRequest="40"
+                TextColor="White"
+                Text="Guardar"/>
+
+            <Button
+                Command="{Binding DeleteCommand}"
+                IsEnabled="{Binding IsEnabled}"
+                IsVisible="{Binding IsEdit}" 
+                HorizontalOptions="FillAndExpand"
+                BackgroundColor="#FBD404"
+                BorderRadius="20"
+                HeightRequest="40"
+                TextColor="Black"
+                Text="Eliminar"/>
+        </StackLayout>
+        <ActivityIndicator
+            IsRunning="{Binding IsRunning}"
+            VerticalOptions="CenterAndExpand"/>
+    </StackLayout>
+    
+    
+    
+</ContentPage>

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.MeasurementsPage"
+             Title="{Binding Title}">
+
+
+
+    <ContentPage.ToolbarItems>
+
+        <ToolbarItem Icon="ic_add" Command="{Binding AddMeasurementCommand}"/>
+    </ContentPage.ToolbarItems>
+    
+    <StackLayout
+        Padding="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label
+                 Grid.Column="0"
+                FontAttributes="Bold"
+                  Text="Medida"
+               HorizontalOptions="CenterAndExpand"/>
+            <Label
+                 Grid.Column="1"
+                FontAttributes="Bold"
+                  Text="Fecha"
+                HorizontalOptions="CenterAndExpand"/>
+            <!--<Label
+                 Grid.Column="2"
+                 FontAttributes="Bold"
+                  Text=""
+                HorizontalOptions="CenterAndExpand"/>-->
+
+        </Grid>
+        <ListView
+            HasUnevenRows="True"
+            ItemsSource="{Binding Measurement}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Frame
+                            OutlineColor="#0a0e3d"
+                            CornerRadius="10"
+                            Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding SelectMeasurEditComand}"/>
+                                </Grid.GestureRecognizers>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!--<Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>-->
+                                <Label                           
+                                Grid.Column="0"
+                                Text="{Binding Measure}"
+                                HorizontalOptions="CenterAndExpand"
+                                     FontSize="Medium"/>
+                                <Label
+                                Grid.Column="1"
+                                Text="{Binding MeasureDateLocal, StringFormat='{0:yyyy/MM/dd}'}"
+                                HorizontalOptions="CenterAndExpand"
+                                     FontSize="Medium"/>
+                                <!--<Image
+                                  Grid.Column="2"
+                                  HorizontalOptions="CenterAndExpand"
+                                  Source="ic_more_vert"/>-->
+                            </Grid>
+                        </Frame>
+
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+
+</ContentPage>

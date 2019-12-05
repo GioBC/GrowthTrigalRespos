@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.LoginPage"
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource colorBackgroud}"
+             >
+    <StackLayout 
+        Padding="20">
+
+        <Image  
+                Margin="20"
+                Source="prueba.png"
+                WidthRequest="1000">
+        </Image>
+
+        <Grid
+             Margin="0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="10*"/>
+            </Grid.ColumnDefinitions>
+   
+            <Entry
+            
+            Grid.Row="0" 
+             Grid.Column="1"
+            Keyboard="Email"
+            Placeholder="Usuario"
+            
+             HorizontalOptions="Fill"
+            Text="{Binding  Usuario}"/>
+         
+            <Entry
+            Grid.Row="1" 
+            Grid.Column="1"
+            IsPassword="True"
+            Placeholder="Contraseña"
+            HorizontalOptions="Fill"
+            Text="{Binding  Clave}"/>
+
+        </Grid>
+
+
+        <!--<StackLayout
+                Orientation="Horizontal">
+            <Label
+                
+                Text="Recuerdame"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="StartAndExpand"
+                    TextColor="Black"/>
+                <Switch
+                   IsToggled="{Binding IsRemember}"
+                   HorizontalOptions="End"
+                   OnColor="#F2E205"
+                   BackgroundColor="{StaticResource colorBackgroud}">
+            </Switch>
+
+        </StackLayout>-->
+
+
+        <StackLayout
+             Margin="30,0"
+                Orientation="Horizontal"
+                VerticalOptions="CenterAndExpand">
+
+            <Button
+                BackgroundColor="#292D4C"
+                BorderRadius="20"
+                HeightRequest="40"
+            Command="{Binding IngresarCommand}"
+            IsEnabled="{Binding IsEnabled}"
+            HorizontalOptions="FillAndExpand"
+            Text="Ingresar"
+            TextColor="White"
+            />
+
+           
+        </StackLayout>
+
+        
+        <ActivityIndicator
+            IsRunning="{Binding IsRunning}"
+            VerticalOptions="CenterAndExpand"/>
+
+    </StackLayout>
+        
+        
+  
+</ContentPage>

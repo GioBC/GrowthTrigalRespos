@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="clr-namespace:Prism.DryIoc;assembly=Prism.DryIoc.Forms"
+             x:Class="GrowthTrigal.Prism.App">
+	<Application.Resources>
+
+        <ResourceDictionary>
+
+            <!-- Parameters -->
+            <x:String x:Key="UrlAPI">https://growthtrigalw.azurewebsites.net/</x:String>
+
+            <!-- Colors -->
+            <Color x:Key="colorBackgroud">#F2F2F2</Color>
+            <Color x:Key="colorPrimary">#0a0e3d</Color>
+            <Color x:Key="colorSecondary">#200F8C</Color>
+            <Color x:Key="colorDanger">#2703A6</Color>
+            <Color x:Key="colorAccent">#F2B705</Color>
+            <Color x:Key="colorFont">#0a0e3d</Color>
+            <Color x:Key="colorFontInverse">#F29F05</Color>
+
+        </ResourceDictionary>
+
+    </Application.Resources>
+    
+    
+</prism:PrismApplication>

@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:prism="http://prismlibrary.com"
+             prism:ViewModelLocator.AutowireViewModel="True"
+             x:Class="GrowthTrigal.Prism.Views.HomesPage"
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource colorBackgroud}">
+    <StackLayout
+        Padding="10">
+        <ListView
+            HasUnevenRows="True"
+            ItemsSource="{Binding Blocks}"
+             SeparatorVisibility="None">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Frame
+                            OutlineColor="#0a0e3d"
+                            CornerRadius="10"
+                            BackgroundColor="LightGray"
+                            Margin="0,0,0,10">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectBlockCommand}"/>
+                            </Frame.GestureRecognizers>
+                            <StackLayout>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <!--<ColumnDefinition Width="*"/>-->
+                                    </Grid.ColumnDefinitions>
+                                    <Grid
+                                     Grid.Column="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Label
+                                    
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                     FontSize="Large"
+                                    FontAttributes="Bold"
+                                    Text="Bloque:"
+                                  VerticalOptions="CenterAndExpand" />
+                                        <Label                                   
+                                    Grid.Row="0"
+                                    Grid.Column="1" 
+                                            FontSize="Large"
+                                    Text="{Binding  BlockNumber}" 
+                                            VerticalOptions="CenterAndExpand"/>
+
+                                    </Grid>
+                                </Grid>
+                            </StackLayout>
+                           
+                        </Frame>
+                    </ViewCell>
+                </DataTemplate>
+                
+            </ListView.ItemTemplate>
+            
+        </ListView>
+       
+        
+    </StackLayout>
+  
+</ContentPage>

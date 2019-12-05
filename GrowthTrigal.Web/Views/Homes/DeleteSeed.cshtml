@@ -1,0 +1,39 @@
+﻿@model GrowthTrigal.Web.Data.Entities.Flower
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this Seed?</h3>
+<div>
+    
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.VarietyName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VarietyName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BedName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BedName)
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteSeed">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-warning" />
+        @*<a asp-action="Index" class="btn btn-success">Back to List</a>*@
+    </form>
+</div>

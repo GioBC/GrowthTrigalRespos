@@ -1,0 +1,74 @@
+﻿@model GrowthTrigal.Web.Data.Entities.Home
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Blocks</h2>
+
+<div>
+    <h4>Details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BlockNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BlockNumber)
+        </dd>
+    </dl>
+</div>
+<div>
+    @*<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>*@
+    <a asp-action="AddSeed" asp-route-id="@Model.Id" class="btn btn-primary">Add Seed</a>
+    <a asp-action="Index" class="btn btn-success">Back to List</a>
+</div>
+@if (Model.Flowers.Count == 0)
+{
+    <h5> Not Seed added yet.</h5>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Flowers.FirstOrDefault().Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Flowers.FirstOrDefault().VarietyName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Flowers.FirstOrDefault().BedName)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Flowers)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VarietyName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BedName)
+                    </td>
+                    <td>
+                        <a asp-action="EditSeed" asp-route-id="@item.Id" class="btn btn-success">Edit Seed</a>
+                        @*<a asp-action="DeleteSeed" asp-route-id="@item.Id" class="btn btn-warning">Delete Seed</a>*@
+                        <a asp-action="DetailsMeasure" asp-route-id="@item.Id" class="btn btn-primary">Measure</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+
+
+}
+
