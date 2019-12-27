@@ -1,9 +1,15 @@
 ﻿using GrowthTrigal.Common.Helpers;
 using GrowthTrigal.Common.Models;
+using GrowthTrigal.Common.Services;
 using MyLeasing.Common.Services;
 using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GrowthTrigal.Prism.ViewModels
 {
@@ -15,34 +21,50 @@ namespace GrowthTrigal.Prism.ViewModels
         private bool _isRunning;
         private bool _isEnabled;
         private DelegateCommand _ingresarCommand;
+       // private DelegateCommand _SincronizarCommand;
+        private DataService _dataService;
+
 
         public LoginPageViewModel(INavigationService navigationService,
             IApiService apiService) : base(navigationService) //constructor 
         {
             _apiService = apiService;
             _navigationService = navigationService;
+            _dataService = new DataService();
             Title = "Flower Growth";
             IsEnabled = true;
 
-            //Usuario = "orlando.munar@globostudio.net";
-            //Clave = "123456";
+            Usuario = "orlando.munar@globostudio.net";
+            Clave = "123456";
 
             AliasFarm = "OL";
-    
+
         }
 
         public DelegateCommand IngresarCommand => _ingresarCommand ?? (_ingresarCommand = new DelegateCommand(Ingresar));
+
+        //public DelegateCommand SincronizarCommand => _SincronizarCommand ?? (_SincronizarCommand = new DelegateCommand(Ingresar));
 
 
         public bool IsRemember { get; set; }
 
         public string AliasFarm { get; set; }
 
-       
 
         public string BlockNumber { get; set; }
 
         public string Usuario { get; set; } // propiedades
+
+        //Test
+        private List<UPResponse> farm { get; set; }
+        private List<TokenRequest> Userlist { get; set; }
+        private List<TokenRequest> Pwdlist { get; set; }
+
+        private List<TokenResponse> Token { get; set; }
+
+
+
+
 
         public string Clave
         {
@@ -61,6 +83,8 @@ namespace GrowthTrigal.Prism.ViewModels
             get => _isEnabled;
             set => SetProperty(ref _isEnabled, value); // refresca la interfaz de usuario
         }
+
+
 
         private async void Ingresar()
         {
@@ -81,27 +105,78 @@ namespace GrowthTrigal.Prism.ViewModels
 
             var url = App.Current.Resources["UrlAPI"].ToString();
             var connection = await _apiService.CheckConnectionAsync(url);
+
             if (!connection)
             {
-                //Settings.Farm = JsonConvert.SerializeObject(this);
-                //Settings.Token = JsonConvert.SerializeObject(token);
+                await LoadUsersFromDB();
                 IsEnabled = true;
                 IsRunning = false;
-                await App.Current.MainPage.DisplayAlert("Error", "Check the internet connection.", "Accept");
-                return;
+                //// App.Current.MainPage.DisplayAlert("Error", "Check the internet connection.", "Accept");
+          
+                try
+                {
+                    if (Userlist.FirstOrDefault().Username.ToString() == Usuario && Pwdlist.FirstOrDefault().Password.ToString() == Clave)
+                    {
+                        var farm2 = farm;
+                        var parameters = new NavigationParameters
+                    {
+                         {"farm1", farm2 }
+                    };
+                        await _navigationService.NavigateAsync("HomesPage", parameters);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe sincronizando conectandote a la red o valide la información", "Aceptar");
+                    return;
+                }
+
+            }
+            else
+            {
+
+                var answer = await this.LoadUsersFromAPI();
+                //    if (answer)
+                //    {
+                //        this.SaveUsersToDB();
+                //        IsEnabled = true;
+                //        IsRunning = false;
+                //    }
             }
 
+
+
+
+        }
+        private async Task LoadUsersFromDB()
+        {
+            farm = await _dataService.GetAllHomes();
+            Userlist = await _dataService.GetUser();
+            Pwdlist = await _dataService.GetPwd(); 
+        }
+
+        //private async Task SaveUsersToDB()
+        //{
+        //    await _dataService.DeleteAllUsers();
+        //    _dataService.Insert(this.Userlist);
+
+        //}
+
+        private async Task<bool> LoadUsersFromAPI()
+        {
+            var url = App.Current.Resources["UrlAPI"].ToString();
             var request = new TokenRequest
             {
                 Password = Clave,
                 Username = Usuario,
                 BlockNumber = BlockNumber,
                 AliasFarm = AliasFarm,
-            
+
             };
 
             var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
-
+            
 
             if (!response.IsSuccess)
             {
@@ -109,8 +184,12 @@ namespace GrowthTrigal.Prism.ViewModels
                 IsEnabled = true;
                 await App.Current.MainPage.DisplayAlert("Error", "User or password incorrect", "Aceptar");
                 Clave = string.Empty;
-                return;
+                return false;
             }
+            
+            await _dataService.DeleteAllUsers();
+            _dataService.Insert(request);
+
 
             var token = response.Result;
             var response3 = await _apiService.GetUPByEmailAsync(
@@ -121,15 +200,19 @@ namespace GrowthTrigal.Prism.ViewModels
                 token.Token,
                 AliasFarm);
 
+            _dataService.Insert(token);
+
             if (!response3.IsSuccess)
             {
                 IsRunning = false;
                 IsEnabled = true;
                 await App.Current.MainPage.DisplayAlert("Error", "Problem with user data", "Aceptar");
-                return;
+                return false;
             }
 
             var farm = response3.Result;
+            await _dataService.DeleteAllUpsHomes();
+            _dataService.Insert(farm);
 
             //Settings.Farm = JsonConvert.SerializeObject(this);
             //Settings.Token = JsonConvert.SerializeObject(token);
@@ -144,14 +227,9 @@ namespace GrowthTrigal.Prism.ViewModels
             await _navigationService.NavigateAsync("HomesPage", parameters);
             IsRunning = false;
             IsEnabled = true;
-
-
-            //await _navigationService.NavigateAsync("HomesPage");
-            //IsRunning = false;
-            //IsEnabled = true;
-
-
+            return true;
         }
     }
-
 }
+
+

@@ -81,7 +81,26 @@
            
         </StackLayout>
 
-        
+        <!--<StackLayout
+             Margin="30,0"
+                Orientation="Horizontal"
+                VerticalOptions="CenterAndExpand">
+
+            <Button
+                BackgroundColor="#292D4C"
+                BorderRadius="20"
+                HeightRequest="40"
+            Command="{Binding SincronizarCommand}"
+            IsEnabled="{Binding IsEnabled}"
+            HorizontalOptions="FillAndExpand"
+            Text="Sincronizar"
+            TextColor="White"
+            />
+
+
+        </StackLayout>-->
+
+
         <ActivityIndicator
             IsRunning="{Binding IsRunning}"
             VerticalOptions="CenterAndExpand"/>

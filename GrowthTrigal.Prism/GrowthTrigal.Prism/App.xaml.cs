@@ -5,12 +5,14 @@ using GrowthTrigal.Prism.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using MyLeasing.Common.Services;
+using GrowthTrigal.Common.Services;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace GrowthTrigal.Prism
 {
     public partial class App
     {
+        DataService dataService;
         /* 
          * The Xamarin Forms XAML Previewer in Visual Studio uses System.Activator.CreateInstance.
          * This imposes a limitation in which the App class must have a default constructor. 
@@ -24,6 +26,7 @@ namespace GrowthTrigal.Prism
         {
             InitializeComponent();
 
+            dataService = new DataService();
             await NavigationService.NavigateAsync("NavigationPage/LoginPage");
 
         }

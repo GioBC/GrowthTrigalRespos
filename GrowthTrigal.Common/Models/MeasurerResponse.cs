@@ -1,22 +1,22 @@
-﻿using SQLite.Net.Attributes;
+﻿
+
+using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GrowthTrigal.Common.Models
 {
     public class MeasurerResponse
     {
-        //[PrimaryKey]
+        [PrimaryKey]
         public int Id { get; set; }
 
-        public string FirstName { get; set; }
+        [ManyToOne]
+        public UserResponse User { get; set; }
 
-        public string LastName { get; set; }
-
-        public string Document { get; set; }
-
-        public string PhoneNumber { get; set; }
-
-        public string Email { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<MeasurementResponse> Measurements { get; set; }
 
         //public override int GetHashCode()
         //{

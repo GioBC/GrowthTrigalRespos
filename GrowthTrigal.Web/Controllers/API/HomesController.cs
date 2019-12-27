@@ -95,18 +95,18 @@ namespace GrowthTrigal.Web.Controllers.API
 
         
 
-        private MeasurerResponse ToMeasurerResponse(Measurer measurer)
-        {
-            return new MeasurerResponse
-            {
-                Document = measurer.User.Document,
-                Email = measurer.User.Email,
-                FirstName = measurer.User.FirstName,
-                LastName = measurer.User.LastName,
-                PhoneNumber = measurer.User.PhoneNumber
+        //private MeasurerResponse ToMeasurerResponse(Measurer measurer)
+        //{
+        //    return new MeasurerResponse
+        //    {
+        //        Document = measurer.User.Document,
+        //        Email = measurer.User.Email,
+        //        FirstName = measurer.User.FirstName,
+        //        LastName = measurer.User.LastName,
+        //        PhoneNumber = measurer.User.PhoneNumber
 
-            };
-        }
+        //    };
+        //}
 
         [HttpGet("GetLastMeasuremetByFlowerId/{id}")]
         public async Task<IActionResult> GetLastMeasuremetByFlowerId([FromRoute] int id)

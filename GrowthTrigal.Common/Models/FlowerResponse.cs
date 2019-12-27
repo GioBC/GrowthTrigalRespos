@@ -1,28 +1,34 @@
-﻿using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
+﻿using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using SQLite;
 
 namespace GrowthTrigal.Common.Models
 {
     public class FlowerResponse
     {
-        //[PrimaryKey]
+        [PrimaryKey]
         public int Id { get; set; }
 
         public string Type { get; set; }
 
         public string VarietyName { get; set; }
 
-
         public string BedName { get; set; }
 
-        //[OneToMany(CascadeOperations = CascadeOperation.CascadeRead)]
-        public ICollection<MeasurementResponse> Measurements { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<MeasurementResponse> Measurements { get; set; }
 
-        //public override int GetHashCode()
-        //{
-        //    return Id;
-        //}
+        [ForeignKey(typeof(HomeResponse))]
+        public int Home_Id { get; set; }
+
+        [ManyToOne]
+        public HomeResponse Home { get; set; }
+
+        public override int GetHashCode()
+        {
+            return Id;
+        }
 
     }
 }
