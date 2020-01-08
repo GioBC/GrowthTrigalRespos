@@ -34,8 +34,8 @@ namespace GrowthTrigal.Prism.ViewModels
             Title = "Flower Growth";
             IsEnabled = true;
 
-            Usuario = "orlando.munar@globostudio.net";
-            Clave = "123456";
+            //Usuario = "orlando.munar@globostudio.net";
+            //Clave = "123456";
 
             AliasFarm = "OL";
 
@@ -179,7 +179,7 @@ namespace GrowthTrigal.Prism.ViewModels
                     else
                     {
 
-                        // _dataService.DeleteAllUsers();
+
                         _dataService.Insert(request);
 
 
@@ -192,7 +192,6 @@ namespace GrowthTrigal.Prism.ViewModels
                             token.Token,
                             AliasFarm);
 
-                        //await _dataService.Insert(token);
 
                         if (!response3.IsSuccess)
                         {
