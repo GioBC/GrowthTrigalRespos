@@ -22,12 +22,11 @@ namespace GrowthTrigal.Common.Services
 
         public DataService()
         {
-              this.OpenOrCreateDB();
+            this.OpenOrCreateDB();
         }
         private async Task OpenOrCreateDB()
         {
-            try
-            {
+
                 var databasePath = DependencyService.Get<IPathService>().GetDatabasePath();
                 this.connection = new SQLiteAsyncConnection(databasePath);
                 await connection.CreateTableAsync<TokenRequest>().ConfigureAwait(false);
@@ -37,28 +36,31 @@ namespace GrowthTrigal.Common.Services
                 await connection.CreateTableAsync<HomeResponse>().ConfigureAwait(false);
                 await connection.CreateTableAsync<UPResponse>().ConfigureAwait(false);
                 await connection.CreateTableAsync<MeasurementRequest>().ConfigureAwait(false);
-            }
-            catch (Exception ex) 
-            {
-                
-            }
+ 
 
         }
         public async Task Insert<T>(List<T> models)
         {
-                await connection.InsertWithChildrenAsync(models, recursive: true).ConfigureAwait(false);
-        }
-        public async Task Insert<T>(T model)
-        {
             try
             {
-                await connection.InsertOrReplaceWithChildrenAsync(model, recursive: true).ConfigureAwait(false);
+                await connection.InsertWithChildrenAsync(models, recursive: true).ConfigureAwait(false);
             }
             catch (Exception ex) 
             {
                 throw;
             }
-               
+              
+        }
+        public async Task Insert<T>(T model)
+        {
+            try
+            {
+                await connection.InsertWithChildrenAsync(model, recursive: true).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         public async Task Update<T>(T model)
         {
@@ -127,7 +129,7 @@ namespace GrowthTrigal.Common.Services
         }
         public async Task<List<TokenRequest>> GetUser()
         {
-            var querty_Users = await this.connection.QueryAsync<TokenRequest>("select * from [TokenRequest]");
+            var querty_Users = await this.connection.QueryAsync<TokenRequest>("select Username from [TokenRequest]");
             var array = querty_Users.ToArray();
             var list = array.Select(tk => new TokenRequest
             {
@@ -135,6 +137,17 @@ namespace GrowthTrigal.Common.Services
                 Password = tk.Password,
                 BlockNumber = tk.BlockNumber,
                 AliasFarm = tk.AliasFarm
+
+            }).ToList();
+            return list;
+        }
+        public async Task<List<TokenRequest>> GetPwd()
+        {
+            var querty_Users = await this.connection.QueryAsync<TokenRequest>("select Password from [TokenRequest]");
+            var array = querty_Users.ToArray();
+            var list = array.Select(tk => new TokenRequest
+            {
+                Password = tk.Password
 
             }).ToList();
             return list;
@@ -168,6 +181,10 @@ namespace GrowthTrigal.Common.Services
             var querty_Flowers = await this.connection.QueryAsync<FlowerResponse>("delete from [FlowerResponse]");
             var querty_Measurement = await this.connection.QueryAsync<MeasurementResponse>("delete from [MeasurementResponse]");
             var querty_Measurer = await this.connection.QueryAsync<MeasurerResponse>("delete from [MeasurerResponse]");
+        }
+        public async Task DeleteAllUsers()
+        {
+            var querty_Users = await this.connection.QueryAsync<TokenRequest>("delete from [TokenRequest]");
         }
         public async Task DeleteAllMeasurers()
         {

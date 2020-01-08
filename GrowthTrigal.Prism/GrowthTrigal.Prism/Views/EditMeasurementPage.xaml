@@ -68,12 +68,21 @@
             </AbsoluteLayout>
 
         </ScrollView>
-        
+
         <StackLayout
-            Margin="30,0"
+            Margin="5,0"
             Orientation="Horizontal"
             VerticalOptions="CenterAndExpand">
-
+            
+            <Button
+                Command="{Binding AgregarCommand}" 
+                IsEnabled="{Binding IsEnabled}"
+                HorizontalOptions="FillAndExpand"
+                BackgroundColor="#292D4C"
+                BorderRadius="20"
+                HeightRequest="40"
+                TextColor="White"
+                Text="Agregar Medida"/>
             <Button
                 Command="{Binding SaveCommand}" 
                 IsEnabled="{Binding IsEnabled}"
@@ -82,9 +91,9 @@
                 BorderRadius="20"
                 HeightRequest="40"
                 TextColor="White"
-                Text="Guardar"/>
-
-            <Button
+                Text=" Sincronizar  "/>
+       
+            <!--<Button
                 Command="{Binding DeleteCommand}"
                 IsEnabled="{Binding IsEnabled}"
                 IsVisible="{Binding IsEdit}" 
@@ -93,12 +102,15 @@
                 BorderRadius="20"
                 HeightRequest="40"
                 TextColor="Black"
-                Text="Eliminar"/>
+                Text="Eliminar"/>-->
         </StackLayout>
+        
         <ActivityIndicator
             IsRunning="{Binding IsRunning}"
             VerticalOptions="CenterAndExpand"/>
+
     </StackLayout>
+    
     
     
     

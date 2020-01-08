@@ -81,7 +81,7 @@
            
         </StackLayout>
 
-        <!--<StackLayout
+        <StackLayout
              Margin="30,0"
                 Orientation="Horizontal"
                 VerticalOptions="CenterAndExpand">
@@ -98,7 +98,7 @@
             />
 
 
-        </StackLayout>-->
+        </StackLayout>
 
 
         <ActivityIndicator

@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using GrowthTrigal.Common.Helpers;
 using GrowthTrigal.Common.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GrowthTrigal.Prism.ViewModels
 {
@@ -14,7 +16,8 @@ namespace GrowthTrigal.Prism.ViewModels
         private readonly INavigationService _navigationService;
         private UPResponse _Up;
         private ObservableCollection<HomeItemViewModel> _homes;
-        private readonly DataService _dataService;
+        private DataService _dataService;
+        private List<UPResponse> UP;
 
 
 
@@ -24,13 +27,6 @@ namespace GrowthTrigal.Prism.ViewModels
         {
             _navigationService = navigationService;
             _dataService = dataService;
-
-            //var up = JsonConvert.DeserializeObject<UPResponse>(Settings.Farm);
-            //Title = $" { up.FarmName}";
-            //LoadFarm();
-
-
-
         }
 
         public ObservableCollection<HomeItemViewModel> Blocks
@@ -40,7 +36,9 @@ namespace GrowthTrigal.Prism.ViewModels
         }
 
 
-        public override void OnNavigatedTo(INavigationParameters parameters)
+
+
+        public async override void OnNavigatedTo(INavigationParameters parameters)
         {
             base.OnNavigatedTo(parameters);
             if (parameters.ContainsKey("farm"))
@@ -70,12 +68,15 @@ namespace GrowthTrigal.Prism.ViewModels
                 }).ToList());
             }
 
+
             if (parameters.ContainsKey("farm1"))
             {
+                await LoadHomes();
 
-                _Up = parameters.GetValue<UPResponse>("farm1");
-                Title = $" { _Up.FarmName}";
-                Blocks = new ObservableCollection<HomeItemViewModel>(_Up.Homes.Select(h => new HomeItemViewModel(_navigationService)
+                var farmName = UP.FirstOrDefault().FarmName;
+                var Homes = UP.FirstOrDefault().Homes;
+                Title = $" { farmName }";
+                Blocks = new ObservableCollection<HomeItemViewModel>(Homes.Select(h => new HomeItemViewModel(_navigationService)
                 {
                     BlockNumber = h.BlockNumber,
                     Id = h.Id,
@@ -96,37 +97,11 @@ namespace GrowthTrigal.Prism.ViewModels
                     }).ToList(),
                 }).ToList());
             }
-
-
-
         }
 
-
-
-        //private void LoadFarm()
-        //{
-        //    //_Up = parameters.GetValue<UPResponse>("farm");
-        //    _Up = JsonConvert.DeserializeObject<UPResponse>(Settings.Farm);
-        //    //Title = $" { _Up.FarmName}";
-        //    Blocks = new ObservableCollection<HomeItemViewModel>(_Up.Homes.Select(h => new HomeItemViewModel(_navigationService)
-        //    {
-        //        BlockNumber = h.BlockNumber,
-        //        Id = h.Id,
-        //        Flowers = h.Flowers?.Select(f => new FlowerResponse
-        //        {
-        //            Id = f.Id,
-        //            Type = f.Type,
-        //            VarietyName = f.VarietyName,
-        //            BedName = f.BedName,
-        //            Measurements = f.Measurements?.Select(mea => new MeasurementResponse
-        //            {
-        //                Measure = mea.Measure,
-        //                MeasureDate = mea.MeasureDate,
-        //                Id = mea.Id
-
-        //            }).ToList(),
-        //        }).ToList(),
-        //    }).ToList());
-        //}
+        private async Task LoadHomes()
+        {
+            UP = await _dataService.GetAllHomes();
+        }
     }
 }

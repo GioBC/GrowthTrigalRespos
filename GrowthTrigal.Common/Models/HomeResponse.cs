@@ -10,7 +10,6 @@ namespace GrowthTrigal.Common.Models
         [PrimaryKey]
         public int Id { get; set; }
 
-
         public string BlockNumber { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
@@ -21,9 +20,6 @@ namespace GrowthTrigal.Common.Models
 
         [ManyToOne]
         public UPResponse UP { get; set; }
-        public override int GetHashCode()
-        {
-            return Id;
-        }
+
     }
 }

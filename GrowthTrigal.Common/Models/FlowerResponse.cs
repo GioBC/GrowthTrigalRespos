@@ -25,10 +25,11 @@ namespace GrowthTrigal.Common.Models
         [ManyToOne]
         public HomeResponse Home { get; set; }
 
-        public override int GetHashCode()
-        {
-            return Id;
-        }
+        //public override int GetHashCode()
+        //{
+        //    return Flower_Id;
+        //}
+
 
     }
 }

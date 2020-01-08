@@ -1,11 +1,14 @@
 ﻿using GrowthTrigal.Common.Helpers;
 using GrowthTrigal.Common.Models;
+using GrowthTrigal.Common.Services;
 using MyLeasing.Common.Services;
 using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Navigation;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GrowthTrigal.Prism.ViewModels
@@ -22,6 +25,9 @@ namespace GrowthTrigal.Prism.ViewModels
         private ObservableCollection<MeasurerResponse> _measurers;
         private MeasurerResponse _measurer;
         private DelegateCommand _saveCommand;
+        private DelegateCommand _agregarCommand;
+        private DataService _dataService;
+        private List<UPResponse> UP;
 
 
 
@@ -46,109 +52,7 @@ namespace GrowthTrigal.Prism.ViewModels
 
         public DelegateCommand SaveCommand => _saveCommand ?? (_saveCommand = new DelegateCommand(SaveAsync));
 
-        private async void SaveAsync()
-        {
-            var isValid = await ValidateDataAsync();
-
-            if (!isValid)
-            {
-                return;
-            }
-
-            IsRunning = true;
-            IsEnabled = false;
-
-            var url = App.Current.Resources["UrlAPI"].ToString();
-            //var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
-            var request = new TokenRequest
-            {
-                Password = Clave,
-                Username = Usuario,
-
-            };
-
-            var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
-            var token = response.Result;
-            var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
-
-
-
-            var measurementRequest = new MeasurementRequest
-            {
-                Measure = Measurement.Measure,
-                Id = Measurement.Id,
-                MeasureDate = Measurement.MeasureDate,
-                FlowerId = flower.Id,
-                //HomeId = home.Id,
-                //UpId = up.Id
-
-            };
-
-
-            
-                Response<object> response2;
-                if (IsEdit)
-                {
-                    response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequest.Id, measurementRequest, "bearer", token.Token);
-                }
-                else
-                {
-                    response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequest, "bearer", token.Token);
-
-                }
-
-                IsRunning = false;
-                IsEnabled = true;
-
-                if (!response2.IsSuccess)
-                {
-
-                    await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
-                    return;
-                }
-
-            
-                await App.Current.MainPage.DisplayAlert(
-                       "Listo", "Creado", "Aceptar");
-            
-
-
-
-            //await MeasurementsPageViewModel.GetInstance().Updateflower();
-
-            //IsRunning = false;
-            //IsEnabled = true;
-
-            //Settings.Farm = JsonConvert.SerializeObject(this);
-
-            //await _navigationService.NavigateAsync("MeasurementsPage");
-
-            //await _navigationService.GoBackToRootAsync();
-
-        }
-
-        private async Task<bool> ValidateDataAsync()
-        {
-            if (string.IsNullOrEmpty(Measurement.Measure))
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "No hay medida!", "Aceptar");
-                return false;
-            }
-
-
-
-
-            if (Measurement.MeasureDate == null)
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "Error no hay fecha", "Aceptar");
-                return false;
-            }
-
-            return true;
-        }
-
-
-
+        public DelegateCommand AgregarCommand => _agregarCommand ?? (_agregarCommand = new DelegateCommand(addMeasureAsync));
 
         public ObservableCollection<MeasurerResponse> Measurers
         {
@@ -168,6 +72,7 @@ namespace GrowthTrigal.Prism.ViewModels
             set => SetProperty(ref _measurement, value);
         }
 
+        private List<MeasurementRequest> Measurelist { get; set; }
 
         public bool IsRunning
         {
@@ -187,7 +92,143 @@ namespace GrowthTrigal.Prism.ViewModels
             set => SetProperty(ref _isEnabled, value);
         }
 
+        private async void addMeasureAsync()
+        {
 
+            var resultvalidate = await ValidateDataAsync();
+
+            if (resultvalidate == true)
+            {
+
+                var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
+
+                var measurementRequest = new MeasurementRequest
+                {
+                    Measure = Measurement.Measure,
+                    Id = Measurement.Id,
+                    MeasureDate = Measurement.MeasureDate,
+                    FlowerId = flower.Id,
+
+                };
+                var datos = new DataService();
+                await datos.Insert(measurementRequest);
+
+                await App.Current.MainPage.DisplayAlert(
+                   "Listo", "Creado", "Aceptar");
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Validar ingreso de datos", "Aceptar");
+            }
+
+
+        }
+
+        private async void SaveAsync()
+        {
+            var url = App.Current.Resources["UrlAPI"].ToString();
+            var connection = await _apiService.CheckConnectionAsync(url);
+            if (!connection)
+            {
+                //IsRunning = true;
+                //IsEnabled = false;
+                await App.Current.MainPage.DisplayAlert("Error", "Valide su conexion a internet para realizar sincronizacion", "Aceptar");
+
+
+            }
+            else
+            {      
+                //var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
+                var request = new TokenRequest
+                {
+                    Password = Clave,
+                    Username = Usuario,
+
+                };
+
+                var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
+                var token = response.Result;
+                // var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
+                try
+                {
+                    DataService dataService = new DataService();
+                    Measurelist = await dataService.GetMeasurers();
+                    if (Measurelist.Count == 0)
+                    {
+                        //IsRunning = true;
+                        //IsEnabled = false;
+
+                        await App.Current.MainPage.DisplayAlert("Alert", "No hay medidas pendiendes para guardar", "Aceptar");
+                    }
+                    else
+                    {
+                        foreach (MeasurementRequest item in Measurelist) 
+                        {
+                            var Measure = item.Measure;
+                            var IdMeasure = item.Id;
+                            var MeasureDate = item.MeasureDate;
+                            var FlowerId = item.FlowerId;
+
+                            var measurementRequest = new MeasurementRequest
+                            {
+                                Measure = Measure,
+                                Id = IdMeasure,
+                                MeasureDate = MeasureDate,
+                                FlowerId = FlowerId
+
+                            };
+
+                            Response<object> response2;
+                            if (IsEdit)
+                            {
+                                response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequest.Id, measurementRequest, "bearer", token.Token);
+                            }
+                            else
+                            {
+                                response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequest, "bearer", token.Token);
+
+                            }
+
+                            if (!response2.IsSuccess)
+                            {
+
+                                await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                                return;
+                            }
+                           
+                        }
+                        //IsRunning = true;
+                        //IsEnabled = false;
+                        await dataService.DeleteAllMeasurers();
+                        await App.Current.MainPage.DisplayAlert(
+                                     "Listo", "Medidas sincronizadas corretamente", "Aceptar");
+                    }
+
+                           
+
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+        }
+
+        private async Task<bool> ValidateDataAsync()
+        {
+            if (string.IsNullOrEmpty(Measurement.Measure))
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "No hay medida!", "Aceptar");
+                return false;
+            }
+
+            if (Measurement.MeasureDate == null)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Error no hay fecha", "Aceptar");
+                return false;
+            }
+
+            return true;
+        }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
         {
@@ -208,36 +249,7 @@ namespace GrowthTrigal.Prism.ViewModels
                 Title = "Nueva Medida";
 
             }
-
-            //LoadMeasurerAsync();
-
         }
 
-
-
-        //private async void LoadMeasurerAsync()
-        //{
-        //    var url = App.Current.Resources["UrlAPI"].ToString();
-        //    var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
-
-        //    var response = await _apiService.GetListAsync<MeasurerResponse>(
-        //        url, "/api", "/Measurer/GetMeasurer", "bearer", token.Token);
-
-
-
-        //    //if (!response.IsSuccess)
-        //    //{
-        //    //    await App.Current.MainPage.DisplayAlert("Error", "Problem with user data", "Aceptar");
-        //    //    return;
-        //    //}
-
-        //    //var measurerslist = (List<MeasurerResponse>)response.Result;
-        //    //Measurers = new ObservableCollection<MeasurerResponse>(measurerslist);
-
-        //    //if (!string.IsNullOrEmpty(Measurement.Measurer))
-        //    //{
-        //    //    Measurer = Measurers.FirstOrDefault(pt => pt.Name == Property.PropertyType);
-        //    //}
-        //}
     }
 }

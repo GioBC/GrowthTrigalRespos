@@ -16,13 +16,8 @@ namespace GrowthTrigal.Common.Models
 
         public string FarmName { get; set; }
 
-        [Column("Homes")]
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<HomeResponse> Homes { get; set; }
 
-        public override int GetHashCode()
-        {
-            return Id;
-        }
     }
 }

@@ -25,13 +25,6 @@ namespace GrowthTrigal.Prism.ViewModels
         {
             Settings.Farm = JsonConvert.SerializeObject(this);
 
-
-            //var parameters = new NavigationParameters
-            //{
-            //    { "home", this }
-            //};
-
-            //await _navigationService.NavigateAsync("FlowerPage",parameters);
             await _navigationService.NavigateAsync("FlowerPage");
         }
     }

@@ -19,14 +19,16 @@ namespace GrowthTrigal.Common.Models
         public DateTime MeasureDateLocal => MeasureDate.ToLocalTime();
 
         [ManyToOne]
-        public MeasurerResponse Measurer { get; set; }
+       public MeasurerResponse Measurer { get; set; }
 
+        [ForeignKey(typeof(FlowerResponse))]
+        public int Flower_Id { get; set; }
         [ManyToOne]
         public FlowerResponse Flower { get; set; }
 
         //public override int GetHashCode()
         //{
-        //    return Id;
+        //    return Measure_Id;
         //}
 
     }

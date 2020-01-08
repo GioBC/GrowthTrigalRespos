@@ -8,7 +8,7 @@ namespace GrowthTrigal.Common.Models
     public class TokenResponse
     {
         [PrimaryKey, AutoIncrement]
-        public int TokenId { get; set; }
+        public int Id { get; set; }
         public string Token { get; set;}
 
         public DateTime Expiration { get; set; }
@@ -19,7 +19,7 @@ namespace GrowthTrigal.Common.Models
 
         public override int GetHashCode()
         {
-            return TokenId;
+            return Id;
         }
     }
 }
