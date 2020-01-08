@@ -115,6 +115,7 @@ namespace GrowthTrigal.Prism.ViewModels
 
                 await App.Current.MainPage.DisplayAlert(
                    "Listo", "Creado", "Aceptar");
+                Measurement.Measure = string.Empty;
             }
             else
             {
@@ -126,19 +127,19 @@ namespace GrowthTrigal.Prism.ViewModels
 
         private async void SaveAsync()
         {
+            IsEnabled = false;
+            IsRunning = true;
+
             var url = App.Current.Resources["UrlAPI"].ToString();
             var connection = await _apiService.CheckConnectionAsync(url);
             if (!connection)
             {
-                //IsRunning = true;
-                //IsEnabled = false;
                 await App.Current.MainPage.DisplayAlert("Error", "Valide su conexion a internet para realizar sincronizacion", "Aceptar");
-
-
+                IsEnabled = true;
+                IsRunning = false;
             }
             else
             {      
-                //var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
                 var request = new TokenRequest
                 {
                     Password = Clave,
@@ -148,17 +149,17 @@ namespace GrowthTrigal.Prism.ViewModels
 
                 var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
                 var token = response.Result;
-                // var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
+
                 try
                 {
                     DataService dataService = new DataService();
                     Measurelist = await dataService.GetMeasurers();
                     if (Measurelist.Count == 0)
                     {
-                        //IsRunning = true;
-                        //IsEnabled = false;
-
                         await App.Current.MainPage.DisplayAlert("Alert", "No hay medidas pendiendes para guardar", "Aceptar");
+         
+                        IsEnabled = true;
+                        IsRunning = false;
                     }
                     else
                     {
@@ -197,11 +198,13 @@ namespace GrowthTrigal.Prism.ViewModels
                             }
                            
                         }
-                        //IsRunning = true;
-                        //IsEnabled = false;
+
                         await dataService.DeleteAllMeasurers();
                         await App.Current.MainPage.DisplayAlert(
                                      "Listo", "Medidas sincronizadas corretamente", "Aceptar");
+
+                        IsEnabled = true;
+                        IsRunning = false;
                     }
 
                            

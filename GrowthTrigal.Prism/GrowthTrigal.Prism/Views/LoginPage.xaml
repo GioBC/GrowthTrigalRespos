@@ -81,7 +81,7 @@
            
         </StackLayout>
 
-        <StackLayout
+        <!--<StackLayout
              Margin="30,0"
                 Orientation="Horizontal"
                 VerticalOptions="CenterAndExpand">
@@ -95,10 +95,10 @@
             HorizontalOptions="FillAndExpand"
             Text="Sincronizar"
             TextColor="White"
-            />
+            />-->
 
 
-        </StackLayout>
+        <!--</StackLayout>-->
 
 
         <ActivityIndicator

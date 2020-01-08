@@ -34,16 +34,13 @@ namespace GrowthTrigal.Prism.ViewModels
             Title = "Flower Growth";
             IsEnabled = true;
 
-            //Usuario = "orlando.munar@globostudio.net";
-            //Clave = "123456";
-
             AliasFarm = "OL";
 
         }
 
         public DelegateCommand IngresarCommand => _ingresarCommand ?? (_ingresarCommand = new DelegateCommand(IngresarAsync));
 
-        public DelegateCommand SincronizarCommand => _SincronizarCommand ?? (_SincronizarCommand = new DelegateCommand(SincronizarAsync));
+        //public DelegateCommand SincronizarCommand => _SincronizarCommand ?? (_SincronizarCommand = new DelegateCommand(SincronizarAsync));
 
 
         public bool IsRemember { get; set; }
@@ -76,8 +73,8 @@ namespace GrowthTrigal.Prism.ViewModels
 
         private async void IngresarAsync()
         {
-            IsRunning = true;
-            IsEnabled = false;
+            //IsRunning = true;
+            //IsEnabled = false;
 
             if (string.IsNullOrEmpty(Usuario))
             {
@@ -93,6 +90,11 @@ namespace GrowthTrigal.Prism.ViewModels
                 }
                 else
                 {
+                    //var url = App.Current.Resources["UrlAPI"].ToString();
+                    //var connection = await _apiService.CheckConnectionAsync(url);
+
+                    //if (!connection)
+                    //{
                     bool isSucces = false;
 
                     IsRunning = true;
@@ -123,9 +125,22 @@ namespace GrowthTrigal.Prism.ViewModels
                     }
                     if (isSucces == false)
                     {
-                        await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe sincronizando conectandote a la red o valide la información", "Aceptar");
+                        
+                        //await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe conectandose a la red o valide la información", "Aceptar");
+                        await SincronizarAsync();
+
+                        IsEnabled = true;
+                        IsRunning = false;
                         return;
+
                     }
+                
+                    //else
+                    //{
+                        
+                    //    await LoadDataFromDBAsync();
+                    //    await LoadUserData();
+                    //}
                 }
             }
         }
@@ -140,13 +155,13 @@ namespace GrowthTrigal.Prism.ViewModels
 
         }
 
-        public async void SincronizarAsync()
+        public async Task SincronizarAsync()
         {
             try
             {
 
-                IsRunning = false;
-                IsEnabled = true;
+                IsRunning = true;
+                IsEnabled = false;
                 var url = App.Current.Resources["UrlAPI"].ToString();
                 var connection = await _apiService.CheckConnectionAsync(url);
 
@@ -226,7 +241,30 @@ namespace GrowthTrigal.Prism.ViewModels
             }
             catch (Exception ex)
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Error inesperado, intente sincronizando nuevamente", "Aceptar");
+                await App.Current.MainPage.DisplayAlert("Error", "Error inesperado, intente ingresar nuevamente", "Aceptar");
+            }
+        }
+        public async Task LoadUserData()
+        {
+            foreach (TokenRequest item in Userlist)
+            {
+                var user = item.Username;
+                var pwd = item.Password;
+
+                if (item.Username == Usuario && item.Password == Clave)
+                {
+
+                    var farm2 = farm;
+
+
+                    var parameters = new NavigationParameters
+                                 {
+                                    {"farm1", farm2 }
+                                 };
+                    await _navigationService.NavigateAsync("HomesPage", parameters);
+                }
+
+
             }
         }
     }
