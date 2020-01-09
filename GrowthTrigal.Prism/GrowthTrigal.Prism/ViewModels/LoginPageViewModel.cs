@@ -21,7 +21,6 @@ namespace GrowthTrigal.Prism.ViewModels
         private bool _isRunning;
         private bool _isEnabled;
         private DelegateCommand _ingresarCommand;
-        private DelegateCommand _SincronizarCommand;
         private DataService _dataService;
 
 
@@ -39,22 +38,12 @@ namespace GrowthTrigal.Prism.ViewModels
         }
 
         public DelegateCommand IngresarCommand => _ingresarCommand ?? (_ingresarCommand = new DelegateCommand(IngresarAsync));
-
-        //public DelegateCommand SincronizarCommand => _SincronizarCommand ?? (_SincronizarCommand = new DelegateCommand(SincronizarAsync));
-
-
         public bool IsRemember { get; set; }
-
         public string AliasFarm { get; set; }
-
-
         public string BlockNumber { get; set; }
-
         public string Usuario { get; set; } // propiedades
-
         private List<UPResponse> farm { get; set; }
         private List<TokenRequest> Userlist { get; set; }
-
         public string Clave
         {
             get => _clave;
@@ -154,7 +143,6 @@ namespace GrowthTrigal.Prism.ViewModels
 
 
         }
-
         public async Task SincronizarAsync()
         {
             try
@@ -167,7 +155,7 @@ namespace GrowthTrigal.Prism.ViewModels
 
                 if (!connection)
                 {
-                    await App.Current.MainPage.DisplayAlert("Error", "Valide su conexion a internet para realizar sincronizacion", "Aceptar");
+                    await App.Current.MainPage.DisplayAlert("Error", "Verifique datos ingresados o valide su conexion a internet para realizar sincronizacion si estos son correctos", "Aceptar");
                 }
                 else
                 {
@@ -188,7 +176,7 @@ namespace GrowthTrigal.Prism.ViewModels
                     {
                         IsRunning = false;
                         IsEnabled = true;
-                        await App.Current.MainPage.DisplayAlert("Error", "Usuario no existe en base de datos, validar info o contactar con aministrador", "Aceptar");
+                        await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecto, o no existe en base de datos, validar info o contactar con administrador", "Aceptar");
                         Clave = string.Empty;
                     }
                     else

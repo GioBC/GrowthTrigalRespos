@@ -26,7 +26,7 @@
                         <Label
                 Grid.Column="0"
                  Grid.Row="0"
-                 Text="Medida"
+                 Text="Medida 1"
                 FontSize="Medium"
                 FontAttributes="Bold"
                  VerticalOptions="Center"/>
@@ -34,18 +34,44 @@
                             Keyboard="Numeric"
                 Grid.Column="1"
                 Grid.Row="0" 
-                 Text="{Binding Measurement.Measure}"/>
+                 Text="{Binding MeasurementOne.Measure}"/>
+
+                        <Label
+                Grid.Column="0"
+                 Grid.Row="1"
+                 Text="Medida 2"
+                FontSize="Medium"
+                FontAttributes="Bold"
+                 VerticalOptions="Center"/>
+                        <Entry
+                            Keyboard="Numeric"
+                Grid.Column="1"
+                Grid.Row="1" 
+                 Text="{Binding MeasurementTwo.Measure}"/>
+
+                        <Label
+                Grid.Column="0"
+                 Grid.Row="2"
+                 Text="Medida 3"
+                FontSize="Medium"
+                FontAttributes="Bold"
+                 VerticalOptions="Center"/>
+                        <Entry
+                            Keyboard="Numeric"
+                Grid.Column="1"
+                Grid.Row="2" 
+                 Text="{Binding MeasurementThree.Measure}"/>
 
                         <Label
                  Grid.Column="0"
-                 Grid.Row="1"
+                 Grid.Row="3"
                     Text="Fecha"
                   FontSize="Medium"
                    FontAttributes="Bold"
                  VerticalOptions="Center"/>
                         <DatePicker
                  Grid.Column="1"
-                 Grid.Row="1"    
+                 Grid.Row="3"    
                  Format="{Binding Measurement.MeasureDateLocal, StringFormat='{0:yyyy/MM/dd}'}"/>
 
                         <!--<Label
@@ -82,7 +108,7 @@
                 BorderRadius="20"
                 HeightRequest="40"
                 TextColor="White"
-                Text="Agregar Medida"/>
+                Text="Agregar Medidas"/>
             <Button
                 Command="{Binding SaveCommand}" 
                 IsEnabled="{Binding IsEnabled}"
@@ -91,7 +117,7 @@
                 BorderRadius="20"
                 HeightRequest="40"
                 TextColor="White"
-                Text=" Sincronizar  "/>
+                Text="   Sincronizar  "/>
        
             <!--<Button
                 Command="{Binding DeleteCommand}"

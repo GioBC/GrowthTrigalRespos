@@ -17,7 +17,9 @@ namespace GrowthTrigal.Prism.ViewModels
     {
         private readonly INavigationService _navigationService;
         private readonly IApiService _apiService;
-        private MeasurementResponse _measurement;
+        private MeasurementResponse _measurementone;
+        private MeasurementResponse _measurementtwo;
+        private MeasurementResponse _measurementthee;
         private string _clave; // atributo privado
         private bool _isRunning;
         private bool _isEnabled;
@@ -66,10 +68,22 @@ namespace GrowthTrigal.Prism.ViewModels
             set => SetProperty(ref _measurer, value);
         }
 
-        public MeasurementResponse Measurement
+        public MeasurementResponse MeasurementOne
         {
-            get => _measurement;
-            set => SetProperty(ref _measurement, value);
+            get =>_measurementone;
+            set => SetProperty(ref _measurementone, value);
+        }
+
+        public MeasurementResponse MeasurementTwo
+        {
+            get => _measurementtwo;
+            set => SetProperty(ref _measurementtwo, value);
+        }
+
+        public MeasurementResponse MeasurementThree
+        {
+            get => _measurementthee;
+            set => SetProperty(ref _measurementthee, value);
         }
 
         private List<MeasurementRequest> Measurelist { get; set; }
@@ -102,20 +116,37 @@ namespace GrowthTrigal.Prism.ViewModels
 
                 var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
 
-                var measurementRequest = new MeasurementRequest
+                var measurementRequestone = new MeasurementRequest
                 {
-                    Measure = Measurement.Measure,
-                    Id = Measurement.Id,
-                    MeasureDate = Measurement.MeasureDate,
+                    Measure = MeasurementOne.Measure,
+                    Id = MeasurementOne.Id,
+                    MeasureDate = MeasurementOne.MeasureDate,
                     FlowerId = flower.Id,
 
                 };
                 var datos = new DataService();
-                await datos.Insert(measurementRequest);
+                await datos.Insert(measurementRequestone);
+                var measurementRequesttwo = new MeasurementRequest
+                {
+                    Measure = MeasurementTwo.Measure,
+                    Id = MeasurementTwo.Id,
+                    MeasureDate = MeasurementTwo.MeasureDate,
+                    FlowerId = flower.Id,
 
+                };
+                await datos.Insert(measurementRequesttwo);
+                var measurementRequestthree = new MeasurementRequest
+                {
+                    Measure = MeasurementThree.Measure,
+                    Id = MeasurementThree.Id,
+                    MeasureDate = MeasurementThree.MeasureDate,
+                    FlowerId = flower.Id,
+
+                };
+                await datos.Insert(measurementRequestthree);
                 await App.Current.MainPage.DisplayAlert(
-                   "Listo", "Creado", "Aceptar");
-                Measurement.Measure = string.Empty;
+                   "Listo", "Medidas creadas", "Aceptar");
+               
             }
             else
             {
@@ -218,13 +249,13 @@ namespace GrowthTrigal.Prism.ViewModels
 
         private async Task<bool> ValidateDataAsync()
         {
-            if (string.IsNullOrEmpty(Measurement.Measure))
+            if (string.IsNullOrEmpty(MeasurementOne.Measure) || string.IsNullOrEmpty(MeasurementTwo.Measure) || string.IsNullOrEmpty(MeasurementThree.Measure))
             {
-                await App.Current.MainPage.DisplayAlert("Error", "No hay medida!", "Aceptar");
+                await App.Current.MainPage.DisplayAlert("Error", "Faltan medidas", "Aceptar");
                 return false;
             }
 
-            if (Measurement.MeasureDate == null)
+            if (MeasurementOne.MeasureDate == null || MeasurementTwo.MeasureDate == null || MeasurementThree.MeasureDate == null)
             {
                 await App.Current.MainPage.DisplayAlert("Error", "Error no hay fecha", "Aceptar");
                 return false;
@@ -239,14 +270,18 @@ namespace GrowthTrigal.Prism.ViewModels
 
             if (parameters.ContainsKey("Measure"))
             {
-                Measurement = parameters.GetValue<MeasurementResponse>("Measure");
+                MeasurementOne = parameters.GetValue<MeasurementResponse>("Measure");
+                MeasurementTwo = parameters.GetValue<MeasurementResponse>("Measure");
+                MeasurementThree = parameters.GetValue<MeasurementResponse>("Measure");
                 IsEdit = true;
                 Title = "Editar Medida";
 
             }
             else
             {
-                Measurement = new MeasurementResponse { MeasureDate = DateTime.Today };
+                MeasurementOne = new MeasurementResponse { MeasureDate = DateTime.Today };
+                MeasurementTwo = new MeasurementResponse { MeasureDate = DateTime.Today };
+                MeasurementThree = new MeasurementResponse { MeasureDate = DateTime.Today };
 
                 IsEdit = false;
                 Title = "Nueva Medida";

@@ -8,7 +8,7 @@ namespace GrowthTrigal.Common.Models
 {
     public class MeasurementRequest
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
         [Required]
