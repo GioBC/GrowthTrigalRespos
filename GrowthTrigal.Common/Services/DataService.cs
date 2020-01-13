@@ -82,6 +82,7 @@ namespace GrowthTrigal.Common.Services
                 var querty_Flowers = await this.connection.QueryAsync<FlowerResponse>("select * from  [FlowerResponse]");
                 var querty_Measurement = await this.connection.QueryAsync<MeasurementResponse>("SELECT * FROM [MeasurementResponse]");
                 var querty_Medidas = await this.connection.QueryAsync<MeasurementRequest>("select * from [MeasurementRequest]");
+               // var querty_Date = await this.connection.QueryAsync<UPResponse>("select UPDate from [UPResponse]");
 
                 var array = querty_UPs.ToList();
                 var arrayHomes = querty_Homes.ToList();
@@ -134,7 +135,8 @@ namespace GrowthTrigal.Common.Services
                 Username = tk.Username,
                 Password = tk.Password,
                 BlockNumber = tk.BlockNumber,
-                AliasFarm = tk.AliasFarm
+                AliasFarm = tk.AliasFarm,
+                fecha = tk.fecha
 
             }).ToList();
             return list;

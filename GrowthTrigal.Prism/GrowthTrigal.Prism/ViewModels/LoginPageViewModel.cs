@@ -41,7 +41,9 @@ namespace GrowthTrigal.Prism.ViewModels
         public bool IsRemember { get; set; }
         public string AliasFarm { get; set; }
         public string BlockNumber { get; set; }
-        public string Usuario { get; set; } // propiedades
+        public string Usuario { get; set; }
+
+        public string fecha { get; set; }// propiedades
         private List<UPResponse> farm { get; set; }
         private List<TokenRequest> Userlist { get; set; }
         public string Clave
@@ -65,31 +67,52 @@ namespace GrowthTrigal.Prism.ViewModels
             //IsRunning = true;
             //IsEnabled = false;
 
-            if (string.IsNullOrEmpty(Usuario))
+            if (string.IsNullOrEmpty(Usuario) || string.IsNullOrEmpty(Clave))
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Debes ingresar el usuario", "Aceptar");
+                await App.Current.MainPage.DisplayAlert("Error", "Debes ingresar el usuario y contraseña", "Aceptar");
                 return;
             }
             else
             {
-                if (string.IsNullOrEmpty(Clave))
+
+                //var url = App.Current.Resources["UrlAPI"].ToString();
+                //var connection = await _apiService.CheckConnectionAsync(url);
+
+                //if (!connection)
+                //{
+                bool isSucces = false;
+
+                IsRunning = true;
+                IsEnabled = false;
+
+                await LoadDataFromDBAsync();
+
+                var result = farm;
+
+                var dateDaystr = DateTime.Now.ToString("yyyy/MM/dd");
+                var dateDay = Convert.ToDateTime(dateDaystr);
+                var dateHour = DateTime.Now.Hour;
+                var dateystr = Userlist.LastOrDefault().fecha.ToString("yyyy/MM/dd");
+                var datey = Convert.ToDateTime(dateystr);
+
+                if (dateDay > datey && dateHour > 4)
                 {
-                    await App.Current.MainPage.DisplayAlert("Error", "Debes ingresar la clave", "Aceptar");
-                    return;
+                    await App.Current.MainPage.DisplayAlert("Alert", "Tienes una actualizacion pendiente!, conecta tu dispositivo a internet e intenta ingresar para cargar nueva información", "Aceptar");
+                    var url = App.Current.Resources["UrlAPI"].ToString();
+                    var connection = await _apiService.CheckConnectionAsync(url);
+
+                    if (!connection)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Error", "Verifique datos ingresados o valide su conexion a internet para realizar sincronizacion si estos son correctos", "Aceptar");
+                    }
+                    else
+                    {
+                        await SincronizarAsync();
+                        await LoadUserData();
+                    }
                 }
                 else
                 {
-                    //var url = App.Current.Resources["UrlAPI"].ToString();
-                    //var connection = await _apiService.CheckConnectionAsync(url);
-
-                    //if (!connection)
-                    //{
-                    bool isSucces = false;
-
-                    IsRunning = true;
-                    IsEnabled = false;
-
-                    await LoadDataFromDBAsync();
                     IsEnabled = true;
                     IsRunning = false;
 
@@ -114,19 +137,19 @@ namespace GrowthTrigal.Prism.ViewModels
                     }
                     if (isSucces == false)
                     {
-                        
-                        //await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe conectandose a la red o valide la información", "Aceptar");
-                        await SincronizarAsync();
+
+                        await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe conectandose a la red o valide la información e ingrese nuevamente", "Aceptar");
+                        //await SincronizarAsync();
 
                         IsEnabled = true;
                         IsRunning = false;
                         return;
 
                     }
-                
+
                     //else
                     //{
-                        
+
                     //    await LoadDataFromDBAsync();
                     //    await LoadUserData();
                     //}
@@ -140,6 +163,7 @@ namespace GrowthTrigal.Prism.ViewModels
 
             farm = await _dataService.GetAllHomes();
             Userlist = await _dataService.GetUser();
+            //Date = await _dataService.GetDate();
 
 
         }
@@ -166,6 +190,7 @@ namespace GrowthTrigal.Prism.ViewModels
                         Username = Usuario,
                         BlockNumber = BlockNumber,
                         AliasFarm = AliasFarm,
+                        fecha = DateTime.Now,
 
                     };
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using SQLite;
+using System;
 
 namespace GrowthTrigal.Common.Models
 {
@@ -24,6 +25,8 @@ namespace GrowthTrigal.Common.Models
 
         [ManyToOne]
         public HomeResponse Home { get; set; }
+
+        public DateTime flowerDate { get; set; }
 
         //public override int GetHashCode()
         //{

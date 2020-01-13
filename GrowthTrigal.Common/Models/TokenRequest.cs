@@ -16,5 +16,7 @@ namespace GrowthTrigal.Common.Models
 
         public string AliasFarm { get; set; }
 
+        public DateTime fecha { get; set; }
+
     }
 }
