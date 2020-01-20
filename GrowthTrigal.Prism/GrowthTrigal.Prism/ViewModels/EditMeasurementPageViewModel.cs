@@ -8,6 +8,7 @@ using Prism.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,10 +27,7 @@ namespace GrowthTrigal.Prism.ViewModels
         private bool _isEdit;
         private ObservableCollection<MeasurerResponse> _measurers;
         private MeasurerResponse _measurer;
-        private DelegateCommand _saveCommand;
         private DelegateCommand _agregarCommand;
-        private DataService _dataService;
-        private List<UPResponse> UP;
 
 
 
@@ -45,214 +43,321 @@ namespace GrowthTrigal.Prism.ViewModels
         }
 
         public string Usuario { get; set; } // propiedades
-
         public string Clave
         {
             get => _clave;
             set => SetProperty(ref _clave, value);
         }
-
-        public DelegateCommand SaveCommand => _saveCommand ?? (_saveCommand = new DelegateCommand(SaveAsync));
-
         public DelegateCommand AgregarCommand => _agregarCommand ?? (_agregarCommand = new DelegateCommand(addMeasureAsync));
-
         public ObservableCollection<MeasurerResponse> Measurers
         {
             get => _measurers;
             set => SetProperty(ref _measurers, value);
         }
-
         public MeasurerResponse Measurer
         {
             get => _measurer;
             set => SetProperty(ref _measurer, value);
         }
-
         public MeasurementResponse MeasurementOne
         {
-            get =>_measurementone;
+            get => _measurementone;
             set => SetProperty(ref _measurementone, value);
         }
-
         public MeasurementResponse MeasurementTwo
         {
             get => _measurementtwo;
             set => SetProperty(ref _measurementtwo, value);
         }
-
         public MeasurementResponse MeasurementThree
         {
             get => _measurementthee;
             set => SetProperty(ref _measurementthee, value);
         }
-
         private List<MeasurementRequest> Measurelist { get; set; }
-
         public bool IsRunning
         {
             get => _isRunning;
             set => SetProperty(ref _isRunning, value);
         }
-
         public bool IsEdit
         {
             get => _isEdit;
             set => SetProperty(ref _isEdit, value);
         }
-
         public bool IsEnabled
         {
             get => _isEnabled;
             set => SetProperty(ref _isEnabled, value);
         }
-
         private async void addMeasureAsync()
         {
-
+            var url = App.Current.Resources["UrlAPI"].ToString();
+            var connection = await _apiService.CheckConnectionAsync(url);
+            var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
             var resultvalidate = await ValidateDataAsync();
 
             if (resultvalidate == true)
             {
-
-                var flower = JsonConvert.DeserializeObject<FlowerResponse>(Settings.Farm);
-
-                var measurementRequestone = new MeasurementRequest
+                if (!connection)
                 {
-                    Measure = MeasurementOne.Measure,
-                    Id = MeasurementOne.Id,
-                    MeasureDate = MeasurementOne.MeasureDate,
-                    FlowerId = flower.Id,
+                    IsEnabled = false;
+                    IsRunning = true;
 
-                };
-                var datos = new DataService();
-                await datos.Insert(measurementRequestone);
-                var measurementRequesttwo = new MeasurementRequest
+                    var measurementRequestone = new MeasurementRequest
+                    {
+                        Measure = MeasurementOne.Measure,
+                        Id = MeasurementOne.Id,
+                        MeasureDate = MeasurementOne.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    var datos = new DataService();
+                    if (measurementRequestone.Measure != null)
+                    {
+                        await datos.Insert(measurementRequestone);
+                    }
+                    var measurementRequesttwo = new MeasurementRequest
+                    {
+                        Measure = MeasurementTwo.Measure,
+                        Id = MeasurementTwo.Id,
+                        MeasureDate = MeasurementTwo.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    if (measurementRequesttwo.Measure != null)
+                    {
+                        await datos.Insert(measurementRequesttwo);
+                    }
+                    var measurementRequestthree = new MeasurementRequest
+                    {
+                        Measure = MeasurementThree.Measure,
+                        Id = MeasurementThree.Id,
+                        MeasureDate = MeasurementThree.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    if (measurementRequestthree.Measure != null)
+                    {
+                        await datos.Insert(measurementRequestthree);
+                    }
+                    await App.Current.MainPage.DisplayAlert(
+                       "Listo", "Medidas creadas", "Aceptar");
+                    IsEnabled = true;
+                    IsRunning = false;
+
+
+                }
+                else
                 {
-                    Measure = MeasurementTwo.Measure,
-                    Id = MeasurementTwo.Id,
-                    MeasureDate = MeasurementTwo.MeasureDate,
-                    FlowerId = flower.Id,
+                    await SaveAsync();
 
-                };
-                await datos.Insert(measurementRequesttwo);
-                var measurementRequestthree = new MeasurementRequest
-                {
-                    Measure = MeasurementThree.Measure,
-                    Id = MeasurementThree.Id,
-                    MeasureDate = MeasurementThree.MeasureDate,
-                    FlowerId = flower.Id,
+                    IsEnabled = false;
+                    IsRunning = true;
 
-                };
-                await datos.Insert(measurementRequestthree);
-                await App.Current.MainPage.DisplayAlert(
-                   "Listo", "Medidas creadas", "Aceptar");
-               
+                    var request = new TokenRequest
+                    {
+                        Password = Clave,
+                        Username = Usuario,
+
+                    };
+
+                    var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
+                    var token = response.Result;
+
+                    var measurementRequestone = new MeasurementRequest
+                    {
+                        Measure = MeasurementOne.Measure,
+                        Id = MeasurementOne.Id,
+                        MeasureDate = MeasurementOne.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    var datos = new DataService();
+                    Response<object> response2;
+                    if (measurementRequestone.Measure != null)
+                    {
+                        if (IsEdit)
+                        {
+                            response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequestone.Id, measurementRequestone, "bearer", token.Token);
+                        }
+                        else
+                        {
+                            response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequestone, "bearer", token.Token);
+
+                        }
+                        if (!response2.IsSuccess)
+                        {
+
+                            await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                            IsEnabled = true;
+                            IsRunning = false;
+                            return;
+
+                        }
+                    }
+                    
+                    var measurementRequesttwo = new MeasurementRequest
+                    {
+                        Measure = MeasurementTwo.Measure,
+                        Id = MeasurementTwo.Id,
+                        MeasureDate = MeasurementTwo.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    if (measurementRequesttwo.Measure != null)
+                    {
+                        if (IsEdit)
+                        {
+                            response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequesttwo.Id, measurementRequesttwo, "bearer", token.Token);
+                        }
+                        else
+                        {
+                            response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequesttwo, "bearer", token.Token);
+
+                        }
+                        if (!response2.IsSuccess)
+                        {
+
+                            await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                            IsEnabled = true;
+                            IsRunning = false;
+                            return;
+
+                        }
+                    }
+                    var measurementRequestthree = new MeasurementRequest
+                    {
+                        Measure = MeasurementThree.Measure,
+                        Id = MeasurementThree.Id,
+                        MeasureDate = MeasurementThree.MeasureDate,
+                        FlowerId = flower.Id,
+
+                    };
+                    if (measurementRequestthree.Measure != null)
+                    {
+                        if (IsEdit)
+                        {
+                            response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequestthree.Id, measurementRequestthree, "bearer", token.Token);
+                        }
+                        else
+                        {
+                            response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequestthree, "bearer", token.Token);
+
+                        }
+                        if (!response2.IsSuccess)
+                        {
+
+                            await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                            IsEnabled = true;
+                            IsRunning = false;
+                            return;
+
+                        }
+                    }
+                    await App.Current.MainPage.DisplayAlert(
+                       "Listo", "Medidas creadas", "Aceptar");
+                    IsEnabled = true;
+                    IsRunning = false;
+                }
             }
-            else
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "Validar ingreso de datos", "Aceptar");
-            }
-
-
         }
-
-        private async void SaveAsync()
+        private async Task SaveAsync()
         {
             IsEnabled = false;
             IsRunning = true;
 
-            var url = App.Current.Resources["UrlAPI"].ToString();
-            var connection = await _apiService.CheckConnectionAsync(url);
-            if (!connection)
+            try
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Valide su conexion a internet para realizar sincronizacion", "Aceptar");
-                IsEnabled = true;
-                IsRunning = false;
-            }
-            else
-            {      
-                var request = new TokenRequest
+                DataService dataService = new DataService();
+                Measurelist = await dataService.GetMeasurers();
+                if (Measurelist.Count == 0)
                 {
-                    Password = Clave,
-                    Username = Usuario,
+                    // await App.Current.MainPage.DisplayAlert("Alert", "No hay medidas pendiendes para guardar", "Aceptar");
 
-                };
-
-                var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
-                var token = response.Result;
-
-                try
+                    IsEnabled = true;
+                    IsRunning = false;
+                }
+                else
                 {
-                    DataService dataService = new DataService();
-                    Measurelist = await dataService.GetMeasurers();
-                    if (Measurelist.Count == 0)
+                    var url = App.Current.Resources["UrlAPI"].ToString();
+
+                    var request = new TokenRequest
                     {
-                        await App.Current.MainPage.DisplayAlert("Alert", "No hay medidas pendiendes para guardar", "Aceptar");
-         
-                        IsEnabled = true;
-                        IsRunning = false;
-                    }
-                    else
+                        Password = Clave,
+                        Username = Usuario,
+
+                    };
+
+                    var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
+                    var token = response.Result;
+
+                    foreach (MeasurementRequest item in Measurelist)
                     {
-                        foreach (MeasurementRequest item in Measurelist) 
+                        var Measure = item.Measure;
+                        var IdMeasure = item.Id;
+                        var MeasureDate = item.MeasureDate;
+                        var FlowerId = item.FlowerId;
+
+                        var measurementRequest = new MeasurementRequest
                         {
-                            var Measure = item.Measure;
-                            var IdMeasure = item.Id;
-                            var MeasureDate = item.MeasureDate;
-                            var FlowerId = item.FlowerId;
+                            Measure = Measure,
+                            Id = IdMeasure,
+                            MeasureDate = MeasureDate,
+                            FlowerId = FlowerId
 
-                            var measurementRequest = new MeasurementRequest
-                            {
-                                Measure = Measure,
-                                Id = IdMeasure,
-                                MeasureDate = MeasureDate,
-                                FlowerId = FlowerId
+                        };
 
-                            };
+                        Response<object> response2;
+                        if (IsEdit)
+                        {
+                            response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequest.Id, measurementRequest, "bearer", token.Token);
+                        }
+                        else
+                        {
+                            response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequest, "bearer", token.Token);
 
-                            Response<object> response2;
-                            if (IsEdit)
-                            {
-                                response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequest.Id, measurementRequest, "bearer", token.Token);
-                            }
-                            else
-                            {
-                                response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequest, "bearer", token.Token);
-
-                            }
-
-                            if (!response2.IsSuccess)
-                            {
-
-                                await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
-                                return;
-                            }
-                           
                         }
 
-                        await dataService.DeleteAllMeasurers();
-                        await App.Current.MainPage.DisplayAlert(
-                                     "Listo", "Medidas sincronizadas corretamente", "Aceptar");
+                        if (!response2.IsSuccess)
+                        {
 
-                        IsEnabled = true;
-                        IsRunning = false;
+                            await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                            IsEnabled = true;
+                            IsRunning = false;
+                            return;
+
+                        }
+
                     }
 
-                           
+                    await dataService.DeleteAllMeasurers();
+                    // await App.Current.MainPage.DisplayAlert(
+                    //             "Listo", "Medidas sincronizadas corretamente", "Aceptar");
 
+                    IsEnabled = true;
+                    IsRunning = false;
                 }
-                catch (Exception ex)
-                {
-                }
+
+
+
             }
-        }
+            catch (Exception ex)
+            {
+            }
 
+        }
         private async Task<bool> ValidateDataAsync()
         {
-            if (string.IsNullOrEmpty(MeasurementOne.Measure) || string.IsNullOrEmpty(MeasurementTwo.Measure) || string.IsNullOrEmpty(MeasurementThree.Measure))
+            if (string.IsNullOrEmpty(MeasurementOne.Measure) && string.IsNullOrEmpty(MeasurementTwo.Measure) && string.IsNullOrEmpty(MeasurementThree.Measure))
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Faltan medidas", "Aceptar");
+                await App.Current.MainPage.DisplayAlert("Faltan Medidas", "Debe agregar al menos una medida para guardar", "Aceptar");
                 return false;
+            }
+            else if (string.IsNullOrEmpty(MeasurementOne.Measure) || string.IsNullOrEmpty(MeasurementTwo.Measure) || string.IsNullOrEmpty(MeasurementThree.Measure))
+            {
+                bool answer = await ValidateEmptyAsync();
+                return answer;
             }
 
             if (MeasurementOne.MeasureDate == null || MeasurementTwo.MeasureDate == null || MeasurementThree.MeasureDate == null)
@@ -263,7 +368,19 @@ namespace GrowthTrigal.Prism.ViewModels
 
             return true;
         }
-
+        private async Task<bool> ValidateEmptyAsync()
+        {
+            bool answer = await App.Current.MainPage.DisplayAlert("Faltan Medidas", "¿ Esta seguro que desea guardar ?", "Aceptar", "Cancelar");
+            Debug.WriteLine("Respuesta: " + answer);
+            if (answer == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public override void OnNavigatedTo(INavigationParameters parameters)
         {
             base.OnNavigatedTo(parameters);
@@ -288,6 +405,5 @@ namespace GrowthTrigal.Prism.ViewModels
 
             }
         }
-
     }
 }

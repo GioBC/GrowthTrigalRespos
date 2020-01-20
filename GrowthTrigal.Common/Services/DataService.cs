@@ -80,43 +80,49 @@ namespace GrowthTrigal.Common.Services
                 var querty_UPs = await this.connection.QueryAsync<UPResponse>("SELECT * FROM [UPResponse]");
                 var querty_Homes = await this.connection.QueryAsync<HomeResponse>("SELECT * FROM [HomeResponse]");
                 var querty_Flowers = await this.connection.QueryAsync<FlowerResponse>("select * from  [FlowerResponse]");
-                var querty_Measurement = await this.connection.QueryAsync<MeasurementResponse>("SELECT * FROM [MeasurementResponse]");
+                //var querty_Measurement = await this.connection.QueryAsync<MeasurementResponse>("SELECT TOP 1 FROM [MeasurementResponse]");
                 var querty_Medidas = await this.connection.QueryAsync<MeasurementRequest>("select * from [MeasurementRequest]");
                // var querty_Date = await this.connection.QueryAsync<UPResponse>("select UPDate from [UPResponse]");
 
                 var array = querty_UPs.ToList();
                 var arrayHomes = querty_Homes.ToList();
                 var arrayFlowers = querty_Flowers.ToList();
-                var arrayMeasurements = querty_Measurement.ToList();
-
-                var list = array.Select(u => new UPResponse
+               // var arrayMeasurements = querty_Measurement.ToList();
+                try
                 {
-                    Id = u.Id,
-                    AliasFarm = u.AliasFarm,
-                    FarmName = u.FarmName,
-                    Homes = arrayHomes.Select(hm => new HomeResponse
+                    var list = array.Select(u => new UPResponse
                     {
-                        Id = hm.Id,
-                        BlockNumber = hm.BlockNumber,
-                        UP_Id = hm.UP_Id,
-                        UP = hm.UP,
-                        Flowers = arrayFlowers.Select(f => new FlowerResponse
+                        Id = u.Id,
+                        AliasFarm = u.AliasFarm,
+                        FarmName = u.FarmName,
+                        Homes = arrayHomes.Select(hm => new HomeResponse
                         {
-                            Id = f.Id,
-                            Type = f.Type,
-                            VarietyName = f.VarietyName,
-                            BedName = f.BedName,
-                            Measurements = arrayMeasurements.Select(mea => new MeasurementResponse
+                            Id = hm.Id,
+                            BlockNumber = hm.BlockNumber,
+                            UP_Id = hm.UP_Id,
+                            UP = hm.UP,
+                            Flowers = arrayFlowers.Select(f => new FlowerResponse
                             {
-                                Measure = mea.Measure,
-                                MeasureDate = mea.MeasureDate,
-                                Id = mea.Id
+                                Id = f.Id,
+                                Type = f.Type,
+                                VarietyName = f.VarietyName,
+                                BedName = f.BedName,
+                                //Measurements = arrayMeasurements.Select(mea => new MeasurementResponse
+                                //{
+                                //    Measure = mea.Measure,
+                                //    MeasureDate = mea.MeasureDate,
+                                //    Id = mea.Id
+                                //}).ToList(),
                             }).ToList(),
                         }).ToList(),
-                    }).ToList(),
-                }).ToList();
- 
-                return list;
+                    }).ToList();
+
+                    return list;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
 
             }
 

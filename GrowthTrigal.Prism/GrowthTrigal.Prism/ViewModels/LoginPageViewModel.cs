@@ -8,6 +8,7 @@ using Prism.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,6 +23,7 @@ namespace GrowthTrigal.Prism.ViewModels
         private bool _isEnabled;
         private DelegateCommand _ingresarCommand;
         private DataService _dataService;
+        private bool _isEdit;
 
 
         public LoginPageViewModel(INavigationService navigationService,
@@ -36,16 +38,15 @@ namespace GrowthTrigal.Prism.ViewModels
             AliasFarm = "OL";
 
         }
-
         public DelegateCommand IngresarCommand => _ingresarCommand ?? (_ingresarCommand = new DelegateCommand(IngresarAsync));
         public bool IsRemember { get; set; }
         public string AliasFarm { get; set; }
         public string BlockNumber { get; set; }
         public string Usuario { get; set; }
-
         public string fecha { get; set; }// propiedades
         private List<UPResponse> farm { get; set; }
         private List<TokenRequest> Userlist { get; set; }
+        private List<MeasurementRequest> Measurelist { get; set; }
         public string Clave
         {
             get => _clave;
@@ -61,12 +62,13 @@ namespace GrowthTrigal.Prism.ViewModels
             get => _isEnabled;
             set => SetProperty(ref _isEnabled, value); // refresca la interfaz de usuario
         }
-
+        public bool IsEdit
+        {
+            get => _isEdit;
+            set => SetProperty(ref _isEdit, value);
+        }
         private async void IngresarAsync()
         {
-            //IsRunning = true;
-            //IsEnabled = false;
-
             if (string.IsNullOrEmpty(Usuario) || string.IsNullOrEmpty(Clave))
             {
                 await App.Current.MainPage.DisplayAlert("Error", "Debes ingresar el usuario y contraseña", "Aceptar");
@@ -74,98 +76,79 @@ namespace GrowthTrigal.Prism.ViewModels
             }
             else
             {
-
-                //var url = App.Current.Resources["UrlAPI"].ToString();
-                //var connection = await _apiService.CheckConnectionAsync(url);
-
-                //if (!connection)
-                //{
-                bool isSucces = false;
-
                 IsRunning = true;
                 IsEnabled = false;
 
                 await LoadDataFromDBAsync();
 
-                var result = farm;
-
-                var dateDaystr = DateTime.Now.ToString("yyyy/MM/dd");
-                var dateDay = Convert.ToDateTime(dateDaystr);
-                var dateHour = DateTime.Now.Hour;
-                var dateystr = Userlist.LastOrDefault().fecha.ToString("yyyy/MM/dd");
-                var datey = Convert.ToDateTime(dateystr);
-
-                if (dateDay > datey && dateHour > 4)
+                try
                 {
-                    await App.Current.MainPage.DisplayAlert("Alert", "Tienes una actualizacion pendiente!, conecta tu dispositivo a internet e intenta ingresar para cargar nueva información", "Aceptar");
-                    var url = App.Current.Resources["UrlAPI"].ToString();
-                    var connection = await _apiService.CheckConnectionAsync(url);
-
-                    if (!connection)
+                    if (Userlist.Count == 0)
                     {
-                        await App.Current.MainPage.DisplayAlert("Error", "Verifique datos ingresados o valide su conexion a internet para realizar sincronizacion si estos son correctos", "Aceptar");
+
+                        if (await CheckConnectionAsync() == true)
+                        {
+                            await SincronizarAsync();
+                            await SaveAsync();
+                        }
+                        else
+                        {
+                            await App.Current.MainPage.DisplayAlert("Alert", "Es tu primer ingreso a la app, Debes tener conexion a internet para cargar informacion", "Aceptar", "Cancelar");
+                            IsRunning = false;
+                            IsEnabled = true;
+                        }
                     }
                     else
                     {
-                        await SincronizarAsync();
-                        await LoadUserData();
-                    }
-                }
-                else
-                {
-                    IsEnabled = true;
-                    IsRunning = false;
+                        var dateDaystr = DateTime.Now.ToString("yyyy/MM/dd");
+                        var dateDay = Convert.ToDateTime(dateDaystr);
+                        var dateHour = DateTime.Now.Hour;
+                        var dateystr = Userlist.LastOrDefault().fecha.ToString("yyyy/MM/dd");
+                        var datey = Convert.ToDateTime(dateystr);
 
-                    foreach (TokenRequest item in Userlist)
-                    {
-                        var user = item.Username;
-                        var pwd = item.Password;
-
-                        if (item.Username == Usuario && item.Password == Clave)
+                        if (dateDay > datey && dateHour > 5)
                         {
-                            isSucces = true;
-                            var farm2 = farm;
+                            await App.Current.MainPage.DisplayAlert("Alert", "Tienes una actualizacion pendiente!, conecta tu dispositivo a internet e intenta ingresar para cargar nueva información,. Si ya tienes conexion espera la sincronizacion", "Aceptar");
+                            var url = App.Current.Resources["UrlAPI"].ToString();
+                            var connection = await _apiService.CheckConnectionAsync(url);
 
 
-                            var parameters = new NavigationParameters
-                                 {
-                                    {"farm1", farm2 }
-                                 };
-                            await _navigationService.NavigateAsync("HomesPage", parameters);
+                            if (!connection)
+                            {
 
+                                bool answer = await App.Current.MainPage.DisplayAlert("Alert", "No tienes conexion, ¿Desea continuar sin realizar la sincronizacion", "Aceptar", "Cancelar");
+                                Debug.WriteLine("Respuesta: " + answer);
+                                if (answer == true)
+                                {
+                                    await LoadUserData();
+                                }
+                            }
+                            else
+                            {
+                                await SincronizarAsync();
+                                await SaveAsync();
+                            }
+                        }
+                        else
+                        {
+                            await LoadUserData();
                         }
                     }
-                    if (isSucces == false)
-                    {
 
-                        await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe conectandose a la red o valide la información e ingrese nuevamente", "Aceptar");
-                        //await SincronizarAsync();
-
-                        IsEnabled = true;
-                        IsRunning = false;
-                        return;
-
-                    }
-
-                    //else
-                    //{
-
-                    //    await LoadDataFromDBAsync();
-                    //    await LoadUserData();
-                    //}
                 }
+                catch (Exception ex)
+                {
+                }
+
+
             }
         }
         private async Task LoadDataFromDBAsync()
         {
-            IsEnabled = true;
-            IsRunning = false;
 
-            farm = await _dataService.GetAllHomes();
             Userlist = await _dataService.GetUser();
-            //Date = await _dataService.GetDate();
-
-
+            farm = await _dataService.GetAllHomes();
+            
         }
         public async Task SincronizarAsync()
         {
@@ -238,10 +221,6 @@ namespace GrowthTrigal.Prism.ViewModels
                             await _dataService.Insert(farm);
                             await LoadDataFromDBAsync();
 
-
-
-
-
                             var parameters = new NavigationParameters
                             {
                                       {"farm", farm }
@@ -259,6 +238,10 @@ namespace GrowthTrigal.Prism.ViewModels
         }
         public async Task LoadUserData()
         {
+            IsEnabled = true;
+            IsRunning = false;
+            bool isSucces = false;
+
             foreach (TokenRequest item in Userlist)
             {
                 var user = item.Username;
@@ -266,7 +249,7 @@ namespace GrowthTrigal.Prism.ViewModels
 
                 if (item.Username == Usuario && item.Password == Clave)
                 {
-
+                    isSucces = true;
                     var farm2 = farm;
 
 
@@ -275,10 +258,115 @@ namespace GrowthTrigal.Prism.ViewModels
                                     {"farm1", farm2 }
                                  };
                     await _navigationService.NavigateAsync("HomesPage", parameters);
+
+                }
+            }
+            if (isSucces == false)
+            {
+
+                await App.Current.MainPage.DisplayAlert("Error", "Usuario o contraseña incorrecta, pruebe conectandose a la red o valide la información / Si esta conectado espere sincronizacion", "Aceptar");
+                await SincronizarAsync();
+
+                IsEnabled = true;
+                IsRunning = false;
+                return;
+
+            }
+        }
+        public async Task<bool> CheckConnectionAsync()
+        {
+            var url = App.Current.Resources["UrlAPI"].ToString();
+            var connection = await _apiService.CheckConnectionAsync(url);
+
+            if (!connection)
+            {
+                await App.Current.MainPage.DisplayAlert("Alert", "No tienes conexion, Debes realizar una primera conexion para empezar a utilizar la aplicacion", "Aceptar");
+                return false;
+            }
+
+            return true;
+        }
+        private async Task SaveAsync()
+        {
+            IsEnabled = false;
+            IsRunning = true;
+
+            var request = new TokenRequest
+            {
+                Password = Clave,
+                Username = Usuario,
+
+            };
+
+            var url = App.Current.Resources["UrlAPI"].ToString();
+            var response = await _apiService.GetTokenAsync(url, "/Account", "/CreateToken", request);
+            var token = response.Result;
+
+            try
+            {
+                DataService dataService = new DataService();
+                Measurelist = await dataService.GetMeasurers();
+                if (Measurelist.Count == 0)
+                {
+                    IsEnabled = true;
+                    IsRunning = false;
+                }
+                else
+                {
+                    foreach (MeasurementRequest item in Measurelist)
+                    {
+                        var Measure = item.Measure;
+                        var IdMeasure = item.Id;
+                        var MeasureDate = item.MeasureDate;
+                        var FlowerId = item.FlowerId;
+
+                        var measurementRequest = new MeasurementRequest
+                        {
+                            Measure = Measure,
+                            Id = IdMeasure,
+                            MeasureDate = MeasureDate,
+                            FlowerId = FlowerId
+
+                        };
+
+                        Response<object> response2;
+                        if (IsEdit)
+                        {
+                            response2 = await _apiService.PutAsync(url, "/api", "/Measurements", measurementRequest.Id, measurementRequest, "bearer", token.Token);
+                        }
+                        else
+                        {
+                            response2 = await _apiService.PostAsync(url, "/api", "/Measurements", measurementRequest, "bearer", token.Token);
+
+                        }
+
+                        if (!response2.IsSuccess)
+                        {
+
+                            await App.Current.MainPage.DisplayAlert("Error", "Hay Problema", "Aceptar");
+                            IsEnabled = true;
+                            IsRunning = false;
+                            return;
+
+                        }
+
+                    }
+
+                    await dataService.DeleteAllMeasurers();
+                    await App.Current.MainPage.DisplayAlert(
+                                 "Listo", "Medidas pendientes fueron sincronizadas corretamente", "Aceptar");
+
+                    IsEnabled = true;
+                    IsRunning = false;
                 }
 
 
+
             }
+            catch (Exception ex)
+            {
+            }
+
         }
     }
 

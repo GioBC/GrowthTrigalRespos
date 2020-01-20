@@ -109,7 +109,7 @@
                 HeightRequest="40"
                 TextColor="White"
                 Text="Agregar Medidas"/>
-            <Button
+            <!--<Button
                 Command="{Binding SaveCommand}" 
                 IsEnabled="{Binding IsEnabled}"
                 HorizontalOptions="FillAndExpand"
@@ -117,7 +117,7 @@
                 BorderRadius="20"
                 HeightRequest="40"
                 TextColor="White"
-                Text="   Sincronizar  "/>
+                Text="   Sincronizar  "/>-->
        
             <!--<Button
                 Command="{Binding DeleteCommand}"
